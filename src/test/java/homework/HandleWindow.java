@@ -10,12 +10,7 @@ import java.util.Set;
 
 public class HandleWindow extends TestBase {
 
-            /*
 
-
-
-
-        */
     @Test
     public void HandleWindow(){
 

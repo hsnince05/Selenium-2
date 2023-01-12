@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import utilities.TestBase;
 
-public class ActionsClassHomeWork extends TestBase {
+public class KeyboardBaseActions extends TestBase {
 
     @Test
     public void test01() throws InterruptedException {

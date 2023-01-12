@@ -58,7 +58,6 @@ public class OdevFaker extends TestBase {
         driver.findElement(By.name("reg_passwd__")).sendKeys(sifre);
 
 
-
         //Tarih icin gun secin
         WebElement gun = driver.findElement(By.name("birthday_day"));
         Select select1 =new Select(gun);
