@@ -1,6 +1,7 @@
 package utilities;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.*;
@@ -27,7 +28,6 @@ public abstract class TestBase {
 //    Sebepi child classlarda gorulebilir olmasi
 
     protected static WebDriver driver;
-
     //    setUp
     @Before
     public void setup()  {
@@ -44,6 +44,8 @@ public abstract class TestBase {
         waitFor(5);
         driver.quit();
     }
+
+
     //    MULTIPLE WINDOW:
 //    1 parametre alir : Gecis Yapmak Istedigim sayfanin Title
 //    ORNEK:
@@ -60,7 +62,6 @@ public abstract class TestBase {
         }
         driver.switchTo().window(origin);
     }
-
     //    windowNumber sıfır (0)'dan başlıyor.
 //    index numarasini parametre olarak alir
 //    ve o indexli pencerece gecis yapar
@@ -68,6 +69,7 @@ public abstract class TestBase {
         List<String> list = new ArrayList<>(driver.getWindowHandles());
         driver.switchTo().window(list.get(windowNumber));
     }
+
 
     /*   HARD WAIT:
      @param : second
@@ -80,16 +82,19 @@ public abstract class TestBase {
         }
     }
 
+
     //    ACTIONS_RIGHT CLICK
     public static void rightClickOnElementActions(WebElement element) {
         Actions actions = new Actions(driver);
         actions.contextClick(element).perform();
     }
 
+
     //ACTIONS_DOUBLE CLICK
     public static void doubleClick(WebElement element) {
         new Actions(driver).doubleClick(element).build().perform();
     }
+
 
     //    ACTIONS_HOVER_OVER
     public static void hoverOverOnElementActions(WebElement element) {
@@ -97,25 +102,30 @@ public abstract class TestBase {
         new Actions(driver).moveToElement(element).perform();
     }
 
+
     //    ACTIONS_SCROLL_DOWN
     public static void scrollDownActions() {
         new Actions(driver).sendKeys(Keys.PAGE_DOWN).perform();
     }
+
 
     //    ACTIONS_SCROLL_UP
     public static void scrollUpActions() {
         new Actions(driver).sendKeys(Keys.PAGE_UP).perform();
     }
 
+
     //    ACTIONS_SCROLL_RIGHT
     public static void scrollRightActions(){
         new Actions(driver).sendKeys(Keys.ARROW_RIGHT).sendKeys(Keys.ARROW_RIGHT).perform();
     }
 
+
     //    ACTIONS_SCROLL_LEFT
     public static void scrollLeftActions(){
         new Actions(driver).sendKeys(Keys.ARROW_LEFT).sendKeys(Keys.ARROW_LEFT).perform();
     }
+
 
     //    ACTIONS_DRAG_AND_DROP
     public static void dragAndDropActions(WebElement source, WebElement target) {
@@ -123,11 +133,13 @@ public abstract class TestBase {
         new Actions(driver).dragAndDrop(source,target).perform();
     }
 
+
     //    ACTIONS_DRAG_AND_DROP_BY
     public static void dragAndDropActions(WebElement source, int x, int y) {
 //        Actions actions = new Actions(driver);
         new Actions(driver).dragAndDropBy(source,x,y).perform();
     }
+
 
     //    DYNAMIC SELENIUM WAITS:
 //===============Explicit Wait==============//
@@ -135,18 +147,24 @@ public abstract class TestBase {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.visibilityOf(element));
     }
+
     public static WebElement waitForVisibility(By locator, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
+
     public static WebElement waitForClickablility(WebElement element, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.elementToBeClickable(element));
     }
+
     public static WebElement waitForClickablility(By locator, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
+
+
+    //COK KULLANILMAZ
     public static void clickWithTimeOut(WebElement element, int timeout) {
         for (int i = 0; i < timeout; i++) {
             try {
@@ -158,7 +176,8 @@ public abstract class TestBase {
         }
     }
 
-    //    This can be used when a new page opens. Yeni sayfaya gecislerde kullanilabilir
+
+    //    This can be used when a new page opens. Yeni sagfaya gecislerde kullanilabilir
     public static void waitForPageToLoad(long timeout) {
         ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
@@ -174,6 +193,7 @@ public abstract class TestBase {
                     "Timeout waiting for Page Load Request to complete after " + timeout + " seconds");
         }
     }
+
 
     //======Fluent Wait====
     // params : xpath of teh element , max timeout in seconds, polling in second
@@ -203,7 +223,7 @@ public abstract class TestBase {
 
     //    SCREENSHOT
 //    @params: WebElement
-//    takes screenshot
+//
     public void takeScreenshotOfElement(WebElement element) throws IOException {
 //        1. take screenshot
         File image = element.getScreenshotAs(OutputType.FILE);
@@ -212,5 +232,46 @@ public abstract class TestBase {
         String currentTime = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
         String path = System.getProperty("user.dir")+"/test-output/Screenshots/"+currentTime+"image.png";
         FileUtils.copyFile(image,new File(path));
+    }
+
+
+    //    SCROLLINTOVIEWJS
+//    @param : WebElement
+//    Verilen webelementin uzerine kaydirir
+    public void scrollIntoViewJS(WebElement element){
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("arguments[0].scrollIntoView(true);",element);
+    }
+
+
+    //    SAYFANIN EN ALTINA IN
+//    Bu method ile sayfanin en altina inebiliriz
+    public void scrollEndJS(){
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("window.scrollTo(0,document.body.scrollHeight)");
+    }
+
+
+    //    Bu metot ile sayfanin en ustune cikabiliriz
+    public void scrollTopJS(){
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("window.scrollTo(0,-document.body.scrollHeight)");
+    }
+
+
+    //    Bu metot ile belirli bir elemente JS executor ile tiklanabilir
+    public void clickByJS(WebElement element){
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("arguments[0].click();",element);
+    }
+
+
+    //   gitmis oldugum metni elemente yazdirir
+//    bu method sendKeys metotuna bir alternatifdir.
+//    sendKeys oncelikli tercihimizdir
+    public void typeWithJS(WebElement element, String metin){
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("arguments[0].setAttribute('value','"+metin+"')",element);
+
     }
 }
