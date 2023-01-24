@@ -1,4 +1,7 @@
 package utilities;
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
@@ -25,7 +28,23 @@ public abstract class TestBase {
 //    Amacim bu sinifi extend etmek ve icindeki hazir metodlari kullanmak
 //    driver objesini olustur. Driver ya public yada protected olmali.
 //    Sebepi child classlarda gorulebilir olmasi
+
     protected static WebDriver driver;
+
+    /*
+
+        1-  <!-- https://mvnrepository.com/artifact/com.aventstack/extentreports --> --> pom.xml'e yuklemek
+        2-Eger extentTeport almak istersek ilk yapmamiz gereken ExtentReport class'indan bir obje olusturmak.
+        3-HTML formatinda duzenlemecegi icin ExtentHtmlReporter  class'indan obje olusturmak
+     */
+
+    protected ExtentReports extentReports; // RAporlamayi baslatiriz
+    protected ExtentHtmlReporter extentHtmlReporter;//Raporumu HTML formatinda duzenler
+
+    protected ExtentTest extentTest; //Test asamalarina extentTest objesi ile bilgi ekleriz
+
+
+
     //    setUp
     @Before
     public void setup()  {
@@ -34,12 +53,32 @@ public abstract class TestBase {
 //        driver=WebDriverManager.chromedriver().create();
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));//20 SANIYEYE KADAR BEKLE.SELENIUM
+
+        //---------------------------------------------------------------------------------------------------------
+        extentReports = new ExtentReports();
+        String tarih = new SimpleDateFormat("hh_mm_ss_ddMMyyyy").format(new Date());
+
+        String dosyaYolu= "target/ExtentReports/htmlreport" + tarih+ ".html";
+        extentHtmlReporter = new ExtentHtmlReporter(dosyaYolu);
+        extentReports.attachReporter(extentHtmlReporter);
+
+        //Raporda gozukmesini istedigimiz bilgiler icin
+        extentReports.setSystemInfo("Browser","Chrome");
+        extentReports.setSystemInfo("Tester","Hasan");
+        extentHtmlReporter.config().setDocumentTitle("Extent Report");
+        extentHtmlReporter.config().setReportName("Test Sonucu ");
+
+
+
+
     }
     //    tearDown
     @After
     public void tearDown(){
         waitFor(5);
         driver.quit();
+
+        extentReports.flush();
     }
     //    MULTIPLE WINDOW:
 //    1 parametre alir : Gecis Yapmak Istedigim sayfanin Title
@@ -109,29 +148,38 @@ public abstract class TestBase {
 //        Actions actions = new Actions(driver);
         new Actions(driver).dragAndDrop(source,target).perform();
     }
+
     //    ACTIONS_DRAG_AND_DROP_BY
     public static void dragAndDropActions(WebElement source, int x, int y) {
 //        Actions actions = new Actions(driver);
         new Actions(driver).dragAndDropBy(source,x,y).perform();
     }
+
+
     //    DYNAMIC SELENIUM WAITS:
 //===============Explicit Wait==============//
     public static WebElement waitForVisibility(WebElement element, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.visibilityOf(element));
     }
+
     public static WebElement waitForVisibility(By locator, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
+
     public static WebElement waitForClickablility(WebElement element, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.elementToBeClickable(element));
     }
+
+
     public static WebElement waitForClickablility(By locator, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
+
+
     //COK KULLANILMAZ
     public static void clickWithTimeOut(WebElement element, int timeout) {
         for (int i = 0; i < timeout; i++) {
@@ -143,7 +191,9 @@ public abstract class TestBase {
             }
         }
     }
-    //    This can be used when a new page opens. Yeni sagfaya gecislerde kullanilabilir
+
+
+    //    This can be used when a new page opens. Yeni sayfaya gecislerde kullanilabilir
     public static void waitForPageToLoad(long timeout) {
         ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
@@ -159,6 +209,8 @@ public abstract class TestBase {
                     "Timeout waiting for Page Load Request to complete after " + timeout + " seconds");
         }
     }
+
+
     //======Fluent Wait====
     // params : xpath of teh element , max timeout in seconds, polling in second
     public static WebElement fluentWait(String xpath, int withTimeout, int pollingEvery) {
@@ -170,6 +222,8 @@ public abstract class TestBase {
         WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
         return element;
     }
+
+
     //   SCREENSHOTS
     public void takeScreenShotOfPage() throws IOException {
 //        1. Take screenshot
@@ -181,6 +235,8 @@ public abstract class TestBase {
         String path = System.getProperty("user.dir")+"/test-output/Screenshots/"+currentTime+"image.png";
         FileUtils.copyFile(image,new File(path));
     }
+
+
     //    SCREENSHOT
 //    @params: WebElement
 //
@@ -193,6 +249,8 @@ public abstract class TestBase {
         String path = System.getProperty("user.dir")+"/test-output/Screenshots/"+currentTime+"image.png";
         FileUtils.copyFile(image,new File(path));
     }
+
+
     //    SCROLLINTOVIEWJS
 //    @param : WebElement
 //    Verilen webelementin uzerine kaydirir
