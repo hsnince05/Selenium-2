@@ -33,6 +33,7 @@ public class C01_Dropdown {
 //        2. Select objesi olustur
         Select yearDropdown = new Select(year);
 
+
 //        3. Select object i kullaarak 3 farkli sekilde secim yapabilirim
         yearDropdown.selectByIndex(22);//SECENEK SIRASI 0 DAN BASLAR. 2000 yili 23. sirada
 
